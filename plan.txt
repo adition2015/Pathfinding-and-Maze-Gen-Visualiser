@@ -1,0 +1,6 @@
+Plan:
+
+A pygame window that allows a maze to be generated and saved as a file
+
+Implement a variety of maze generation algorithms and be able to visualise them
+Implement a variety of pathfinding algorithms and be able to visualise them:
