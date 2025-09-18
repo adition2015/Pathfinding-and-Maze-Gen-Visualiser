@@ -3,6 +3,7 @@
 
 # Imports
 import pygame, sys
+import numpy as np
 
 # Variables
 w, h = 800, 800
@@ -22,14 +23,14 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            # Handles resizing
+            """# Handles resizing
             if event.type == pygame.VIDEORESIZE:
                 neww, newh = event.w, event.h
                 resize_grid(neww, newh, grid_size)
-                pygame.display.flip()
+                pygame.display.flip()"""
         # Render visualiser   
         screen.fill("black")
-        fill_grid(x, y, grid_size)
+        draw_maze(maze_grid, screen, grid_size)
 
 
         # Flips the display to put work on screen:
@@ -37,21 +38,12 @@ def main():
 
         clock.tick(60) # limits FPS to 60
 
+# MIsc functions
 
 # Fills 80% of the screen with a x, y grid at the center
 # grid stays square
-"""def fill_grid(x, y):
-    global w, h
-    size = 0.8 # relative to screen
-    cw, ch = (size*w)//x, (size*h)//x
-    offset = (1-size)/2
-    for i in range(x+1):        
-        pygame.draw.line(screen, "cyan", (i*cw+(offset*w), offset*h), (i*cw+(offset*w), (1-offset)*h))
-    for j in range(y+1):
-        pygame.draw.line(screen, "cyan", (offset*w, j*ch+(offset*h)), ((1-offset)*w, j*ch+(offset*h)))
-"""
 
-def fill_grid(x, y, grid_size):
+"""def fill_grid(x, y, grid_size):
     global w, h
     min_dim = min(w, h) # returns integer for 
     # base offsets from the smaller dimension
@@ -70,7 +62,42 @@ def resize_grid(neww, newh, grid_size):
     newx, newy = int(grid_size*neww/x), int(grid_size*newh//y)
     screen.fill("black")
     fill_grid(newx, newy, grid_size)
-    
+"""
+def grid(x, y): # creates a numpy grid: x rows, y columns, with walls
+    grid = np.full((x, y), 15, dtype=np.uint8)
+    return grid
+
+def draw_maze(grid, surface, grid_size):
+    rows, cols = grid.shape[:2]
+    min_dim = min(surface.get_width(), surface.get_height())
+    size = grid_size * min_dim
+    cw, ch = size / cols, size / rows
+    offsetw, offseth = (surface.get_width() - size) / 2, (surface.get_height() - size) / 2
+
+    for y in range(rows):
+        for x in range(cols):
+            cell = grid[y, x]
+
+            # Bitmask to determine what walls to draw:
+            if cell & 1: # top
+                pygame.draw.line(surface, "cyan",
+                                 (offsetw + x*cw, offseth + y*cw),
+                                 (offsetw + (x+1)*cw, offseth + y*ch))
+            if cell & 2: # right
+                pygame.draw.line(surface, "cyan",
+                                 (offsetw + (x+1)*cw, offseth + y*cw),
+                                 (offsetw + (x+1)*cw, offseth + (y+1)*ch))
+            if cell & 4: # bottom
+                pygame.draw.line(surface, "cyan",
+                                 (offsetw + x*cw, offseth + (y+1)*cw),
+                                 (offsetw + (x+1)*cw, offseth + (y+1)*ch))
+            if cell & 8: # left
+                pygame.draw.line(surface, "cyan",
+                                 (offsetw + x*cw, offseth + y*cw),
+                                 (offsetw + x*cw, offseth + (y+1)*ch))
+
+# Pre-run variables
+maze_grid = grid(x, y)
 
 # Tests
 if __name__ == "__main__":
