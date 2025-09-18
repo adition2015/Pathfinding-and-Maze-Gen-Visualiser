@@ -1,5 +1,6 @@
 # Imports
 import numpy as np
+import main
 
 WALLS = {
     "top": 1,
@@ -23,30 +24,61 @@ VECTORS = {
 }
 
 # Misc Functions
+def random_coords(grid):
+    coords = [np.random.randint(0, dim) for dim in grid.shape[:2]]
+    return coords
 
+def get_unvisited_neighbours(x, y, grid, visited):
+    neighbours = []
+    for direction, (dx, dy) in VECTORS.items():
+        nx, ny = x + dx, y + dy # neighbouring cell
+        if 0 <= nx < grid.shape[1] and 0 <= ny < grid.shape[0]: # checks whether coordinate is within grid dims
+            if not visited[ny, nx]: # checks whether cell has been visited
+                neighbours.append((nx, ny, direction))
+    return neighbours
 
+def remove_wall(grid, x, y, direction):
+    opp = OPPOSITE[direction]
+    dx, dy = VECTORS[direction]
+
+    grid[y, x] &= ~WALLS[direction] # remove wall from current
+    grid[y+dy, x+dx] &= ~WALLS[opp] # remove wall from neighbour
 
 # Maze Gen Functions
-def depth_first_search(x, y): # x, y - grid width, grid height
-    # grid array
-    grid = np.full((x, y), 15, dtype=np.uint8)# fills a grid with 15; 1|2|4|8, so all walls filled
+def depth_first_search(grid): 
+    # Visited array, stores bool in same shape as grid
+    visited = np.zeros(grid.shape, dtype=bool)
 
-    # random cell coordinates
-    cell_x = np.random.random_integers(0, x, 1)
-    cell_y = np.random.random_integers(0, y, 1)
+    # generate random coordinate from grid
+    stack = []
+    x, y = 0, 0 # start cell
+    visited[y, x] = True
 
-    #direction vectors:
-    LEFT = [-1, 0]
-    RIGHT = [1, 0]
-    UP = [0, 1]
-    DOWN = [0, -1]
+    while True:
+        neighbours = get_unvisited_neighbours(x, y, grid, visited)
+        if neighbours:
+            nx, ny, direction = np.random.choice(neighbours)
+            remove_wall(grid, x, y, direction)
+            stack.append((x, y)) # remember current cell for backtracking
+            x, y = nx, ny # updates current cell
+            visited[y, x] = True # marks previous cell as visited
+        elif stack: # stack > is stack not empty?
+            x, y = stack.pop()
+        else:
+            break
 
-    print()
+    return grid
+        
 
-    #while grid.find(0) != False:
-        #pass
+
+
+
+
 
     
-
     
 
+# Tests
+if __name__ == "__main__":
+    test_grid = main.grid(20, 10)
+    depth_first_search(test_grid)
