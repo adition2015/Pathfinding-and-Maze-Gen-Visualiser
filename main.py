@@ -55,19 +55,19 @@ def fill_grid(x, y, grid_size):
     global w, h
     min_dim = min(w, h) # returns integer for 
     # base offsets from the smaller dimension
-    cw, ch = int(grid_size*min_dim//x), int(grid_size*min_dim//y)
     size = grid_size*min_dim
+    cw, ch = size/x, size/y
     offsetw, offseth = (w-size)/2, (h-size)/2
     for i in range(x+1):
         pygame.draw.line(screen, "cyan", (offsetw + (i*cw), offseth), (offsetw + (i*cw), offseth+size))
     for j in range(y+1):
         pygame.draw.line(screen, "cyan", (offsetw, offseth + (j*ch)), (offsetw + size, offseth + (j*ch)))
-    
+
 
 def resize_grid(neww, newh, grid_size):
     global w, h
     w, h = neww, newh
-    newx, newy = int(grid_size*neww//x), int(grid_size*newh//y)
+    newx, newy = int(grid_size*neww/x), int(grid_size*newh//y)
     screen.fill("black")
     fill_grid(newx, newy, grid_size)
     
