@@ -2,7 +2,7 @@
 # Make the window resizable, with the grid being 80% of the screen when resized.
 
 # Imports
-import pygame, sys
+import pygame, sys, json
 import numpy as np
 import maze_gen as mg
 
@@ -30,17 +30,30 @@ def main():
             maze_grid, current_cell, done = next(maze_gen) # generates next step of maze
         except StopIteration:
             pass
-        draw_maze(maze_grid, screen, grid_size, current_cell, done) # updates walls as grid walls change
+        #draw_maze(maze_grid, screen, grid_size, current_cell, done) # updates walls as grid walls change
+        load_grid("maze_1.npy")
         # Flips the display to put work on screen:
         pygame.display.flip()
 
         clock.tick(60) # limits FPS to 60
 
+
 # Misc functions
+def save_grid(grid, filename): # saves grid as numpy array
+    with open(filename, "wb") as f:
+        np.save(f, grid)
+        print(f"File saved in {filename}")
+    
 
 def grid(x, y): # creates a numpy grid: x rows, y columns, with walls
     grid = np.full((x, y), 15, dtype=np.uint8)
     return grid
+
+
+def load_grid(filename):
+    with open(filename, "rb") as f:
+        grid = np.load(f)
+    draw_maze(grid, screen, grid_size, None, None)      
 
 def draw_maze(grid, surface, grid_size, current_cell, done):# Draws a maze, accounting for wall removal
     rows, cols = grid.shape[:2]
@@ -79,6 +92,7 @@ def draw_maze(grid, surface, grid_size, current_cell, done):# Draws a maze, acco
     if done:
         pygame.draw.rect(surface, "green", (offsetw, offseth, cw, ch)) # start cell
         pygame.draw.rect(surface, "red", (offsetw + (cols-1)*cw, offseth + (rows-1)*ch, cw, ch)) # end cell
+        save_grid(grid, "maze_1.npy")
 
 # Pre-run variables
 maze_grid = grid(x, y)

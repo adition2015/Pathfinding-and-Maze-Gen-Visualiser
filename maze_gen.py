@@ -44,8 +44,6 @@ def remove_wall(grid, x, y, direction):
     nx, ny = x + dx, y + dy
     if 0 <= nx < grid.shape[1] and 0 <= ny < grid.shape[0]:
         grid[ny, nx] = grid[ny, nx] & (15 - WALLS[opp])
-    print(grid[y, x])
-    print(grid[y+dy, x+dx])
 
 # Maze Gen Functions
 def depth_first_search(grid): 
@@ -59,6 +57,7 @@ def depth_first_search(grid):
     visited[y, x] = True
 
     while True:
+        print("Running")
         neighbours = get_unvisited_neighbours(x, y, grid, visited)
         if neighbours:
             nx, ny, direction = random.choice(neighbours)
@@ -74,10 +73,6 @@ def depth_first_search(grid):
             break
         yield grid, (x, y), done # yields current grid and current cell, and whether generation is done
 
-
-
-    
-    
 
 # Tests
 if __name__ == "__main__":
