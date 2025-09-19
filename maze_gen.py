@@ -53,6 +53,7 @@ def depth_first_search(grid):
     visited = np.zeros(grid.shape, dtype=bool)
 
     # generate random coordinate from grid
+    done = False
     stack = []
     x, y = 0, 0 # start cell
     visited[y, x] = True
@@ -68,12 +69,10 @@ def depth_first_search(grid):
         elif stack: # stack > is stack not empty?
             x, y = stack.pop()
         else:
-            break   
-        yield grid
-        
-
-
-
+            done = True
+            yield grid, (x, y), done
+            break
+        yield grid, (x, y), done # yields current grid and current cell, and whether generation is done
 
 
 
