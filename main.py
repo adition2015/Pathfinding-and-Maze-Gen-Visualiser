@@ -4,6 +4,7 @@
 # Imports
 import pygame, sys
 import numpy as np
+import maze_gen as mg
 
 # Variables
 w, h = 800, 800
@@ -26,15 +27,17 @@ def main():
         # Render visualiser   
         screen.fill("black")
         draw_maze(maze_grid, screen, grid_size) # updates walls as grid walls change
-
-
+        try:
+            next(maze_gen) # generates next step of maze
+        except StopIteration:
+            pass
+    
         # Flips the display to put work on screen:
         pygame.display.flip()
 
         clock.tick(60) # limits FPS to 60
 
 # Misc functions
-
 
 def grid(x, y): # creates a numpy grid: x rows, y columns, with walls
     grid = np.full((x, y), 15, dtype=np.uint8)
@@ -71,6 +74,7 @@ def draw_maze(grid, surface, grid_size):# Draws a maze, accounting for wall remo
 
 # Pre-run variables
 maze_grid = grid(x, y)
+maze_gen = mg.depth_first_search(maze_grid)
 
 # Tests
 if __name__ == "__main__":

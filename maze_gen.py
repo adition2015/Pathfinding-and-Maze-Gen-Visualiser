@@ -1,27 +1,23 @@
 # Imports
 import numpy as np
-import main
+import random
 
-WALLS = {
-    "top": 1,
-    "right": 2,
-    "bottom": 4,
-    "left": 8
-}
 
-OPPOSITE = {
-    "top": "bottom",
-    "right": "left",
-    "bottom": "top",
-    "left": "right"
-}
+# bitmasks
+WALLS = {"top": np.uint8(1),
+         "right": np.uint8(2), 
+         "bottom": np.uint8(4),
+           "left": np.uint(8)}
 
-VECTORS = {
-    (0, -1): "top",
-    (1, 0): "right",
-    (0, 1): "bottom",
-    (-1, 0): "left"
-}
+OPPOSITE = {"top": "bottom",
+            "right": "left", 
+            "bottom": "top", 
+            "left": "right"}
+
+VECTORS = {"top": (0, -1), 
+           "right": (1, 0), 
+           "bottom": (0, 1), 
+           "left": (-1, 0)}
 
 # Misc Functions
 def random_coords(grid):
@@ -41,8 +37,15 @@ def remove_wall(grid, x, y, direction):
     opp = OPPOSITE[direction]
     dx, dy = VECTORS[direction]
 
-    grid[y, x] &= ~WALLS[direction] # remove wall from current
-    grid[y+dy, x+dx] &= ~WALLS[opp] # remove wall from neighbour
+    # current cell
+    grid[y, x] = grid[y, x] & (15 - WALLS[direction])
+
+    # neighbor cell
+    nx, ny = x + dx, y + dy
+    if 0 <= nx < grid.shape[1] and 0 <= ny < grid.shape[0]:
+        grid[ny, nx] = grid[ny, nx] & (15 - WALLS[opp])
+    print(grid[y, x])
+    print(grid[y+dy, x+dx])
 
 # Maze Gen Functions
 def depth_first_search(grid): 
@@ -57,7 +60,7 @@ def depth_first_search(grid):
     while True:
         neighbours = get_unvisited_neighbours(x, y, grid, visited)
         if neighbours:
-            nx, ny, direction = np.random.choice(neighbours)
+            nx, ny, direction = random.choice(neighbours)
             remove_wall(grid, x, y, direction)
             stack.append((x, y)) # remember current cell for backtracking
             x, y = nx, ny # updates current cell
@@ -65,9 +68,8 @@ def depth_first_search(grid):
         elif stack: # stack > is stack not empty?
             x, y = stack.pop()
         else:
-            break
-
-    return grid
+            break   
+        yield grid
         
 
 
@@ -80,5 +82,4 @@ def depth_first_search(grid):
 
 # Tests
 if __name__ == "__main__":
-    test_grid = main.grid(20, 10)
-    depth_first_search(test_grid)
+    pass
